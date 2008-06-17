@@ -157,6 +157,9 @@ struct nfs4_ace * nfs4_ace_from_string(char *ace_buf, int is_dir)
 	if (ret < 0) {
 		printf("Scanning ACE string '%s' failed.\n", bufp);
 		goto out;
+	} else if (strlen(fields[WHO_INDEX]) > NFS4_MAX_PRINCIPALSIZE) {
+		fprintf(stderr,"Principal \'%s\' is too large.\n",fields[WHO_INDEX]);
+		goto out;
 	}
 
 	switch (*fields[TYPE_INDEX]) {
