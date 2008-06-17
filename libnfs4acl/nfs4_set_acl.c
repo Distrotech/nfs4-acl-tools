@@ -45,20 +45,25 @@ int nfs4_set_acl(struct nfs4_acl *acl, const char *path)
 	res = acl_nfs4_xattr_pack(acl, &xdrbuf);
 	if (res <= 0) {
 		fprintf(stderr, "Failed to populate xattr from nfs4acl\n");
-		goto out;
+		goto out_free;
 	}
 
 	res = setxattr(path, ACL_NFS4_XATTR, (char *)xdrbuf, res, XATTR_REPLACE);
-	if ((res == -1 && errno == EOPNOTSUPP) || (res == -10032))
-		fprintf(stderr, "Operation to set ACL not supported.\n");
-	else if (res == -1 && errno == ENOATTR)
-		fprintf(stderr, "Attribute not found on file.\n");
-	else if (res == -1)
-		perror("setxattr");
-	else if (res < -1)
-		fprintf(stderr, "Failed setxattr operation on %s (code %d)\n", path, res);
+	if (res < -10000) {
+		fprintf(stderr,"An internal NFS server error code (%d) was returned; this should never happen.\n",res);
+		goto out_free;
+	} else if (res < 0) {
+		if (errno == EOPNOTSUPP)
+			fprintf(stderr,"Operation to set ACL not supported.\n");
+		else if (errno == ENOATTR)
+			fprintf(stderr,"ACL Attribute not found on file.\n");
+		else if (errno == EREMOTEIO)
+			fprintf(stderr,"An NFS server error occurred.\n");
+		else
+			perror("Failed setxattr operation");
+	}
 
+out_free:
 	free(xdrbuf);
-out:
 	return res;
 }
