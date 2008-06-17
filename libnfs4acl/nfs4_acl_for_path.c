@@ -88,16 +88,20 @@ out:
 
 static int nfs4_getxattr(const char *path, void *value, size_t size)
 {
-	int result;
+	int res;
 
-	result = getxattr(path, ACL_NFS4_XATTR, value, size);
-	if (result < 0) {
+	res = getxattr(path, ACL_NFS4_XATTR, value, size);
+	if (res < -10000) {
+		fprintf(stderr,"An internal NFS server error code (%d) was returned; this should never happen.\n",res);
+	} else if (res < 0) {
 		if (errno == ENOATTR)
-			printf("Attribute not found on file.\n");
+			fprintf(stderr,"Attribute not found on file.\n");
+		else if (errno == EREMOTEIO)
+		    fprintf(stderr,"An NFS server error occurred.\n");
 		else if (errno == EOPNOTSUPP)
-			printf("Operation to request attribute not supported.\n");
+			fprintf(stderr,"Operation to request attribute not supported.\n");
 		else
-			perror("Failed getxattr operation\n");
+			perror("Failed getxattr operation");
 	}
-	return result;
+	return res;
 }
