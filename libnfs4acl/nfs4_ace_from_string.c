@@ -299,7 +299,13 @@ struct nfs4_ace * nfs4_ace_from_string(char *ace_buf, int is_dir)
 
 	ace = nfs4_new_ace(is_dir, type, flags, mask, 
 			acl_nfs4_get_whotype(fields[WHO_INDEX]), fields[WHO_INDEX]);
+
 	if (ace == NULL) {
+		fprintf(stderr,"ACE is NULL.\n");
+		goto out_free;
+	} else if (12 + strlen(ace->who) > NFS4_MAX_ACESIZE) {
+		/* ace type,flag,access_mask are each u32 (3 * 4 bytes) */
+		fprintf(stderr,"ACE is too large.\n");
 		goto out_free;
 	}
 
