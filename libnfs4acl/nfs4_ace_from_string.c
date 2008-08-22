@@ -225,6 +225,9 @@ struct nfs4_ace * nfs4_ace_from_string(char *ace_buf, int is_dir)
 		field++;
 	}
 
+	if (!strcmp(fields[WHO_INDEX], NFS4_ACL_WHO_GROUP_STRING))
+			flags |= NFS4_ACE_IDENTIFIER_GROUP;
+
 	field = fields[MASK_INDEX];
 	for (buflen = strlen(field); buflen > 0; buflen--) {
 		ret = -EINVAL;
