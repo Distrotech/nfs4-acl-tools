@@ -140,9 +140,8 @@ out_free:
 struct nfs4_ace * nfs4_ace_from_string(char *ace_buf, int is_dir)
 {
 	int ret;
-	char *fields[NUMFIELDS];
+	char *fields[NUMFIELDS], *bufp, *field;
 	u32 type, flags = 0, mask = 0;
-	char *bufp;
 	int buflen;
 	struct nfs4_ace *ace = NULL;
 
@@ -152,14 +151,20 @@ struct nfs4_ace * nfs4_ace_from_string(char *ace_buf, int is_dir)
 	if (*ace_buf == '\0' || *ace_buf == '#')
 		return NULL;
 
-	bufp = ace_buf;
+	/* parse_alloc_fields had split up ace_buf so now we copy it to bufp */
+	bufp = malloc(strlen(ace_buf) + 1);
+	if (!bufp)
+		goto out_free;
+	strcpy(bufp,ace_buf);
+
 	ret = parse_alloc_fields(bufp, fields);
+	free(bufp);
 	if (ret < 0) {
-		printf("Scanning ACE string '%s' failed.\n", bufp);
+		fprintf(stderr,"Scanning ACE string '%s' failed.\n", ace_buf);
 		goto out;
 	} else if (strlen(fields[WHO_INDEX]) > NFS4_MAX_PRINCIPALSIZE) {
 		fprintf(stderr,"Principal \'%s\' is too large.\n",fields[WHO_INDEX]);
-		goto out;
+		goto out_free;
 	}
 
 	switch (*fields[TYPE_INDEX]) {
@@ -176,13 +181,13 @@ struct nfs4_ace * nfs4_ace_from_string(char *ace_buf, int is_dir)
 			type = NFS4_ACE_SYSTEM_ALARM_ACE_TYPE;
 			break;
 		default:
-			printf("Bad Ace Type:%c\n", *fields[TYPE_INDEX]);
-                        goto out_free;
+			fprintf(stderr,"Bad Ace Type:%c\n", *fields[TYPE_INDEX]);
+			goto out_free;
 	}
 
-	bufp = fields[FLAG_INDEX];
-	for (buflen = strlen(bufp); buflen > 0; buflen--) {
-		switch (*bufp) {
+	field = fields[FLAG_INDEX];
+	for (buflen = strlen(field); buflen > 0; buflen--) {
+		switch (*field) {
 			case FLAG_FILE_INHERIT:
 				flags |= NFS4_ACE_FILE_INHERIT_ACE;
 				break;
@@ -214,16 +219,16 @@ struct nfs4_ace * nfs4_ace_from_string(char *ace_buf, int is_dir)
 				flags |= NFS4_ACE_EVERYONE;
 				break;
 			default:
-				printf("Bad Ace Flag:%c\n", *bufp);
+				fprintf(stderr,"Bad Ace Flag:%c\n", *field);
 				goto out_free;
 		}
-		bufp++;
+		field++;
 	}
 
-	bufp = fields[MASK_INDEX];
-	for (buflen = strlen(bufp); buflen > 0; buflen--) {
+	field = fields[MASK_INDEX];
+	for (buflen = strlen(field); buflen > 0; buflen--) {
 		ret = -EINVAL;
-		switch (*bufp) {
+		switch (*field) {
 //			case PERM_LIST_DIR:
 //				if (!(is_dir & NFS4_ACL_ISDIR))
 //					goto out_not_dir;
@@ -294,10 +299,10 @@ struct nfs4_ace * nfs4_ace_from_string(char *ace_buf, int is_dir)
 				mask |= NFS4_ACE_GENERIC_EXECUTE;
 				break;
 			default:
-				printf("Bad Ace Mask:%c\n", *bufp);
+				fprintf(stderr,"Bad Ace Mask:%c\n", *field);
 				goto out_free;
 		}
-		bufp++;
+		field++;
 	}
 
 	ace = nfs4_new_ace(is_dir, type, flags, mask, 
