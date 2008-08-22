@@ -128,7 +128,7 @@ int main(int argc, char **argv)
 {
 	int opt, err = 1;
 	int numpaths = 0, curpath = 0;
-	char *tmp, **paths, *path = NULL, *spec_file = NULL;
+	char *tmp, **paths = NULL, *path = NULL, *spec_file = NULL;
 	FILE *s_fp = NULL;
 
 	if (!strcmp(basename(argv[0]), "nfs4_editfacl")) {
@@ -322,6 +322,8 @@ int main(int argc, char **argv)
 		free(tmp);
 	}
 out:
+	if (paths)
+		free(paths);
 	return err;
 }
 
