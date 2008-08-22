@@ -1,0 +1,15 @@
+#!/bin/sh
+#
+# NFSv4 ACL tool contextual-menu support for Nautilus/GNOME:
+#
+# - to install with Nautilus < 1.0.5, copy this to ~/Nautilus/scripts/
+# - to install with a newer Nautilus, copy this to ~/.gnome2/nautilus-scripts/
+#
+# - in all cases, make that file executable with: chmod +x <file>
+#
+#
+# i don't use GNOME or nautilus, so it might be ~/.gnome/ or something.
+#
+#  david m. richter / nfsv4@linux-nfs.org
+
+echo "$NAUTILUS_SCRIPT_SELECTED_FILE_PATHS" | xargs -L 1 nfs4-acl-editor

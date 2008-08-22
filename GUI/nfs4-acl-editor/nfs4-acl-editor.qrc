@@ -1,0 +1,13 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+	<file>images/user.gif</file>
+	<file>images/user-light.gif</file>
+	<file>images/group2.gif</file>
+	<file>images/dmr-groop-test1.gif</file>
+	<file>images/citi-icon.gif</file>
+	<file>images/everyone.gif</file>
+	<file>images/everyone2.gif</file>
+	<file>images/dir.png</file>
+	<file>images/file.png</file>
+</qresource>
+</RCC>

@@ -1,0 +1,25 @@
+#!/bin/sh -x
+#
+# old CVS script.
+# clean out our junk/dirty secrets and make a tarball
+
+maj=`grep PKG_MAJOR VERSION | sed -e 's/.*PKG_MAJOR=\(.\).*/\1/'`
+min=`grep PKG_MINOR VERSION | sed -e 's/.*PKG_MINOR=\(.\).*/\1/'`
+rel=`grep PKG_REVISION VERSION | sed -e 's/.*PKG_REVISION=\(.\).*/\1/'`
+ver="${maj}.${min}.${rel}"
+
+find . -name CVS | xargs rm -rf
+rm prep-for-web
+rm GUI/*html*
+rm GUI/*suck*
+rm -rf GUI/acl_editor
+make clean
+
+pushd GUI/nfs4-acl-editor
+make clean
+rm -rf nfs4-acl-editor
+popd
+
+cd ..
+mv nfs4-acl-tools{,-$ver}
+tar cvzf /tmp/nfs4-acl-tools-`date +%Y%m%d`.tar.gz nfs4-acl-tools-$ver && echo "made the tarball .."

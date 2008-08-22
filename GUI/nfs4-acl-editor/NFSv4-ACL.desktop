@@ -1,0 +1,13 @@
+; this file should go in:  /opt/kde3/share/apps/konqueror/servicemenus/
+;
+; to set a custom icon for this, copy the file:  ./images/citi-icon.gif
+; into:  /opt/kde3/share/apps/konqueror/pics/
+		 
+[Desktop Entry]
+ServiceTypes=all/all
+Actions=editNFSv4ACL
+
+[Desktop Action editNFSv4ACL]
+Name=Edit NFSv4 ACL
+Icon=/opt/kde3/share/apps/konqueror/pics/citi-icon.gif
+Exec=nfs4-acl-editor %f
