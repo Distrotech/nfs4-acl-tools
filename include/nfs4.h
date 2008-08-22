@@ -16,6 +16,8 @@
 
 #define NFS4_VERIFIER_SIZE	8
 #define NFS4_FHSIZE		128
+
+/* this is max filename length? */
 #define NFS4_MAXNAMLEN		NAME_MAX
 
 #define NFS4_ACCESS_READ        0x0001
@@ -95,18 +97,28 @@ enum nfs4_acl_whotype {
 	NFS4_ACL_WHO_EVERYONE,
 };
 
-#define NFS4_ACL_WHO_OWNER_STRING		"OWNER@"
-#define NFS4_ACL_WHO_GROUP_STRING		"GROUP@"
+#define NFS4_ACL_WHO_OWNER_STRING	"OWNER@"
+#define NFS4_ACL_WHO_GROUP_STRING	"GROUP@"
 #define NFS4_ACL_WHO_EVERYONE_STRING	"EVERYONE@"
 
-// dmr remove XXX: this is an arbitrary number; find the real one.
-#define XXX_PRINCIPAL_MAX  257
+/*
+ * this is my best guess about the principal name -- there are a lot of different
+ * ideas.  utmp.h limits usernames to 32 characters, but v4 names (excluding the
+ * domain component) up to 128 characters are tolerated in idmapd.c.  so, 128.
+ *
+ * DNS limits domain names to roughly 256 characters (more like 253 in practice,
+ * but call it 256), but nfsidmap.h seems to indicate v4 domains could have up to
+ * 512 characters.  i can't see a reason not to trust the DNS limit.  so, 256.
+ *
+ * add 1 for '@', 1 for NULL.
+ */
+#define NFS4_MAX_PRINCIPALSIZE  (128 + 256 + 1 + 1)
 struct nfs4_ace {
 	u_int32_t	type;
 	u_int32_t	whotype;
 	u_int32_t	flag;
 	u_int32_t	access_mask;
-	char		who[XXX_PRINCIPAL_MAX];
+	char		who[NFS4_MAX_PRINCIPALSIZE];
 	TAILQ_ENTRY(nfs4_ace) l_ace;
 };
 

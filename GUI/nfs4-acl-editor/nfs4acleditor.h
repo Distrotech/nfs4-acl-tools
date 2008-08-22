@@ -83,8 +83,8 @@ extern "C" {
 
 #define isGroupFlag(f) (f & NFS4_ACE_IDENTIFIER_GROUP)
 #define isGroupACE(a)  (isGroupFlag(a->flag))
-#define isSpecialGroup(s) (!strncmp(qPrintable(s), "GROUP@", XXX_PRINCIPAL_MAX))
-#define isEveryone(s) (!strncmp(qPrintable(s), "EVERYONE@", XXX_PRINCIPAL_MAX))
+#define isSpecialGroup(s) (!strncmp(qPrintable(s), "GROUP@", NFS4_MAX_PRINCIPALSIZE))
+#define isEveryone(s) (!strncmp(qPrintable(s), "EVERYONE@", NFS4_MAX_PRINCIPALSIZE))
 #define groupifyACE(a) a->flag |= NFS4_ACE_IDENTIFIER_GROUP
 #define ungroupifyACE(a) a->flag &= ~NFS4_ACE_IDENTIFIER_GROUP
 
@@ -156,7 +156,7 @@ static const struct __access_info __extra_perm_info[] = {
 	{NFS4_ACE_GENERIC_EXECUTE, "\"exec\"", ""},
 	{NFS4_ACE_MASK_ALL, "all", ""},
 };
-			
+
 static const struct __access_info __ace_type_info[] = {
 	{NFS4_ACE_ACCESS_ALLOWED_ACE_TYPE, "ALLOW", "A"},
 	{NFS4_ACE_ACCESS_DENIED_ACE_TYPE, "DENY", "D"},

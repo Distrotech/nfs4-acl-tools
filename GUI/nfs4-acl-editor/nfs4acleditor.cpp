@@ -38,11 +38,11 @@ NFS4_ACL_Editor::NFS4_ACL_Editor(QWidget *parent, char *filearg) : QMainWindow(p
 	uis = QString(":images/user.gif");
 	gis = QString(":images/group2.gif");
 	eis = QString(":images/everyone2.gif");
-	
+
 	uils = QString(":images/user-light.gif");
 	gils = QString(":images/group2.gif");
 	eils = QString(":images/everyone2.gif");
-	
+
 	nacl = NULL;
 	pbg = NULL;
 	dpbg = NULL;
@@ -131,7 +131,7 @@ NFS4_ACL_Editor::NFS4_ACL_Editor(QWidget *parent, char *filearg) : QMainWindow(p
 
 void NFS4_ACL_Editor::typeModified(int index)
 {
-	int newtypemask = maskForType(index); 
+	int newtypemask = maskForType(index);
 
 	if (acl.empty() || selectedLogical < 0 || selectedVisual < 0 || selectedACE == NULL)
 		return;
@@ -163,7 +163,7 @@ void NFS4_ACL_Editor::permsModified(QAbstractButton *a)
 
 	if (acl.empty() || selectedLogical < 0 || selectedVisual < 0 || selectedACE == NULL)
 		return;
-	
+
 	if (c->isChecked())
 		selectedACE->access_mask |= pbg->id(c);
 	else
@@ -199,7 +199,7 @@ void NFS4_ACL_Editor::flagsModified(QAbstractButton *a)
 void NFS4_ACL_Editor::aceSelected(int row, int column, int prevrow, int prevcolumn)
 {
 	if (acl.empty())
-		return; 
+		return;
 
 	dprintf("aceSelected(): deleting? %d   row %d col %d  prevrow %d prevcol %d   currentrow %d\n", deleting, row, column, prevrow, prevcolumn, tw->currentRow());
 	if (!deleting) {
@@ -216,9 +216,9 @@ void NFS4_ACL_Editor::aceSelected(int row, int column, int prevrow, int prevcolu
 		if (row == 1 && prevrow == 0) {
 			selectedLogical = 0;
 			selectedVisual = 0;
-		} 
-		
-		/* during a DELETE, the outgoing row is still included in rowCount().  
+		}
+
+		/* during a DELETE, the outgoing row is still included in rowCount().
 		 * currentRow is the new end-of-list index.
 		 * to see if currentRow will-soon-be the end-of-list, subtract two (1 for 0-based,
 		 *   and 1 for "haven't decremented for the outgoing row yet"-in the table).
@@ -251,7 +251,7 @@ void NFS4_ACL_Editor::aceSelected(int row, int column, int prevrow, int prevcolu
 	updateType();
 	updatePerms();
 	updateFlags();
-	
+
 	dprintf("aceSelected(): sindex %d is type %d '%s'\n", selectedVisual, selectedACE->type, selectedACE->who);
 }
 
@@ -358,13 +358,13 @@ void NFS4_ACL_Editor::deleteACE()
 	if (acl.empty() || nacl == NULL || selectedLogical < 0 || selectedVisual < 0 || selectedACE == NULL)
 		return;
 //	dprintf("deleteACE(): deleting %s  type %d   logical: %d  visual: %d  (ACE: %x %s)\n", selectedACE->who, selectedACE->type, selectedLogical, selectedVisual, acl.at(selectedVisual)->type, acl.at(selectedVisual)->who);
-	
+
 	deleting = 1;
 	dprintf("deleteACE(): naces %d  acl %d  rows %d \n", nacl->naces, acl.size(), tw->rowCount());
 	dprintf("deleteACE(): sACE %p  %s  ACL(0) %p  %s\n", selectedACE, selectedACE->who, acl.at(0), acl.at(0)->who);
 	nfs4_remove_ace(nacl, selectedACE);
 	acl.removeAt(tw->currentRow());
-	
+
 	dprintf("\n\n");
 	for (int z = 0; z < tw->rowCount(); z++) {
 		dprintf("logical row %d seems to be visual row %d\n", z, tw->visualRow(z));
@@ -390,7 +390,7 @@ void NFS4_ACL_Editor::setACL()
 
 	if (acl.empty() || nacl == NULL)
 		return;
-	
+
 	/* must reorder nfs4_acl to match our NFS4_ACL and make "who" match */
 	//printf("\npre-reordering:\n");	//acl_nfs4_print(nacl);
 	TAILQ_INIT(&nacl->ace_head);
@@ -405,7 +405,7 @@ void NFS4_ACL_Editor::setACL()
 }
 
 /* b/c of signals, moveUp/moveDown need to be functions and not just #defines */
-void NFS4_ACL_Editor::move(int by) 
+void NFS4_ACL_Editor::move(int by)
 {
 	int at = tw->currentRow();
 	int to = at + by;
@@ -441,7 +441,7 @@ void NFS4_ACL_Editor::initWithFile(QString file)
 	is_directory = nacl->is_directory;
 	pbg = (is_directory) ? dpbg : fpbg;
 	sbg = (is_directory) ? dsbg : fsbg;
-	
+
 	acl.clear();
 	nfs4_acl_to_NFS4_ACL(nacl, &acl);
 	sw->setCurrentIndex(is_directory);
@@ -547,9 +547,9 @@ QIcon NFS4_ACL_Editor::iconForPrincipal(const char *name, int is_group)
 	if (name == NULL)
 		return QIcon();
 
-	if (!strncmp(NFS4_ACL_WHO_EVERYONE_STRING, name, XXX_PRINCIPAL_MAX))
+	if (!strncmp(NFS4_ACL_WHO_EVERYONE_STRING, name, NFS4_MAX_PRINCIPALSIZE))
 		return QIcon(eis);
-	else if (!strncmp(NFS4_ACL_WHO_GROUP_STRING, name, XXX_PRINCIPAL_MAX) 
+	else if (!strncmp(NFS4_ACL_WHO_GROUP_STRING, name, NFS4_MAX_PRINCIPALSIZE)
 				|| is_group)
 		return QIcon(gis);
 	else
@@ -564,12 +564,12 @@ void NFS4_ACL_Editor::syncWho(struct nfs4_ace *ace, const char *who)
 		return;
 
 	dprintf("syncWho(): changing %x '%s' (%x) to '%s' (type %d)\n", ace, ace->who, ace->who, who, ace->type);
-	if (strncmp(ace->who, who, XXX_PRINCIPAL_MAX)) {
+	if (strncmp(ace->who, who, NFS4_MAX_PRINCIPALSIZE)) {
 		i = strlen(who);
 		if (i > strlen(ace->who)) {
 			dprintf("syncWho(): fromlen %d  tolen %u\n", strlen(ace->who), i);
 		}
-		strncpy(ace->who, who, XXX_PRINCIPAL_MAX - 1);
+		strlcpy(ace->who, who, NFS4_MAX_PRINCIPALSIZE);
 	}
 }
 
@@ -740,7 +740,7 @@ void NFS4_ACL_Editor::populatePerms(QGroupBox *qgb, QButtonGroup *qbg, int is_di
 	hbl->setMargin(0);
 	w->setLayout(hbl);
 	sgl->addWidget(w, (FILE_PERM_COUNT + 2), 0, 2, 2, Qt::AlignBottom);
-		
+
 	connect(sbg, SIGNAL(buttonClicked(QAbstractButton *)), this, SLOT(shortcutsModified(QAbstractButton *)));
 	qgb->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	qgb->setLayout(sgl);
@@ -754,7 +754,7 @@ void NFS4_ACL_Editor::populateFlags()
 	fbg->setExclusive(false);
 	sgl = new QGridLayout(fgb);
 	sgl->setSpacing(0);
-	
+
 	for (int i = 0; i < FLAG_COUNT; i++) {
 		cb = new QCheckBox(textForFlag(i), fgb);
 		fbg->addButton(cb, maskForFlag(i));
@@ -805,7 +805,7 @@ void NFS4_ACL_Editor::keyPressEvent(QKeyEvent *e)
 		doHighlight(1);
 }
 
-void NFS4_ACL_Editor::keyReleaseEvent(QKeyEvent *e) 
+void NFS4_ACL_Editor::keyReleaseEvent(QKeyEvent *e)
 {
 	if (!(e->modifiers() & Qt::ControlModifier) && (e->key() == Qt::Key_Control))
 		doHighlight(0);
@@ -836,7 +836,7 @@ void NFS4_ACL_Editor::show()
 	dprintf("show()ing!  table w: %d h: %d,  shw: %d  shh: %d,\n"
 			"        viewport w: %d h: %d,  shw: %d  shh: %d \n"
 			"          window w: %d h: %d,  shw: %d  shh: %d \n",
-			tw->width(), tw->height(), tw->sizeHint().width(), tw->sizeHint().height(), 
+			tw->width(), tw->height(), tw->sizeHint().width(), tw->sizeHint().height(),
 			tw->viewport()->width(), tw->viewport()->height(), tw->viewport()->sizeHint().width(),
 			tw->viewport()->sizeHint().height(),
 			width(), height(), sizeHint().width(), sizeHint().height());

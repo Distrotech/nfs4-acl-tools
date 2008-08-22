@@ -41,10 +41,10 @@
  */
 int nfs4_remove_file_aces(struct nfs4_acl *acl, FILE *fd)
 {
-	char ace_buf[NFS4_MAX_ACESIZE + 1];   /* null-term */
-	char acl_spec[NFS4_MAX_ACESIZE * 20]; /* assuming no more than 20 entries */
+	char ace_buf[NFS4_MAX_ACESIZE];
+	char acl_spec[NFS4_MAX_ACLSIZE];
 
-	memset(acl_spec, '\0', NFS4_MAX_ACESIZE * 20);
+	memset(acl_spec, '\0', NFS4_MAX_ACLSIZE);
 	while (fgets(ace_buf, NFS4_MAX_ACESIZE, fd) != NULL)
 		strncat(acl_spec, ace_buf, NFS4_MAX_ACESIZE);
 

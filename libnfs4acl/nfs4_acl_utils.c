@@ -114,7 +114,7 @@ int nfs4_replace_ace(struct nfs4_acl *acl, struct nfs4_ace *old_ace, struct nfs4
 {
 	if (acl == NULL || old_ace == NULL || new_ace == NULL)
 		return -1;
-	
+
 	TAILQ_INSERT_AFTER(&acl->ace_head, old_ace, new_ace, l_ace);
 	TAILQ_REMOVE(&acl->ace_head, old_ace, l_ace);
 
@@ -140,7 +140,7 @@ int nfs4_replace_ace_spec(struct nfs4_acl *acl, char *from_ace_spec, char *to_ac
 
 	for (orig_ace = nfs4_get_first_ace(acl); orig_ace != NULL; nfs4_get_next_ace(&orig_ace)) {
 		if (!nfs4_ace_cmp(from_ace, orig_ace)) {
-			new_ace = nfs4_new_ace(acl->is_directory, to_ace->type, to_ace->flag, 
+			new_ace = nfs4_new_ace(acl->is_directory, to_ace->type, to_ace->flag,
 					to_ace->access_mask, to_ace->whotype, to_ace->who);
 			if (new_ace == NULL)
 				goto frito;
@@ -165,10 +165,10 @@ out:
  */
 int nfs4_ace_cmp(struct nfs4_ace *lhs, struct nfs4_ace *rhs)
 {
-	if ((lhs->type == rhs->type) 
+	if ((lhs->type == rhs->type)
 			&& (lhs->flag == rhs->flag)
 			&& (lhs->access_mask == rhs->access_mask)
-			&& (!strncmp(lhs->who, rhs->who, XXX_PRINCIPAL_MAX)))
+			&& (!strncmp(lhs->who, rhs->who, NFS4_MAX_PRINCIPALSIZE)))
 		return 0;
 	return 1;
 }

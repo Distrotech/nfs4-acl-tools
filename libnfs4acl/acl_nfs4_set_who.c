@@ -75,7 +75,7 @@ int acl_nfs4_set_who(struct nfs4_ace* ace, int type, char* who)
 	if (wholen < 1)
 		goto inval_failed;
 
-	memset(ace->who, '\0', XXX_PRINCIPAL_MAX);
+	memset(ace->who, '\0', NFS4_MAX_PRINCIPALSIZE);
 	strcpy(ace->who, iwho);
 	ace->whotype = type;
 

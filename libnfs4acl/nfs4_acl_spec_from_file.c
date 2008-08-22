@@ -34,23 +34,31 @@
 #include "libacl_nfs4.h"
 
 
-char * nfs4_acl_spec_from_file(FILE *f) 
+char * nfs4_acl_spec_from_file(FILE *f)
 {
-	char ace_buf[NFS4_MAX_ACESIZE + 1];
+	char ace_buf[NFS4_MAX_ACESIZE];
 	char *acl_spec, *c;
+	int consumed = 0;
 
 	if (!f)
 		return NULL;
 
-	/* assumes no more than 20 entries */
-	acl_spec = calloc(1, sizeof(char) * (NFS4_MAX_ACESIZE * 20));
+	acl_spec = calloc(1, NFS4_MAX_ACLSIZE);
 	if (!acl_spec)
 		return NULL;
-	
+
 	while (fgets(ace_buf, NFS4_MAX_ACESIZE, f) != NULL) {
 		if ((c = strchr(ace_buf, '#')) != NULL)
 			*c = '\0';
+		consumed += strlen(ace_buf);
+		if (consumed > NFS4_MAX_ACLSIZE) {
+			fprintf(stderr, "ERROR: maximum ACL buffer size exceeded (%d > %d).\n",
+					NFS4_MAX_ACLSIZE, consumed);
+			free(acl_spec);
+			return NULL;
+		}
 		strncat(acl_spec, ace_buf, NFS4_MAX_ACESIZE);
+
 	}
 
 	return acl_spec;

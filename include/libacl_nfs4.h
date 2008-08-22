@@ -105,27 +105,35 @@
 	 == ((mask2) & NFS4_ACE_MASK_ALL & ~NFS4_ACE_MASK_IGNORE & \
 		 				~NFS4_ACE_DELETE_CHILD))
 
-/* Maximum length of the ace->who attribute */
-#define NFS4_ACL_WHO_LENGTH_MAX		2048
-#define NFS4_ACL_WHO_BUFFER_LEN_GUESS	255
-
-/* NFS4_MAX_ACESIZE
- * :     4 of these
- * index 2   (no more than 99 ACES in an ACL !)
- * type  2  (space + Type letter)
- * flag  10 (total number of flag characters)
- * who   128  XXX what should this be? NAME_MAX is 255 ...
- * mask  14 ( total number of dir + common mask characters)
+/*
+ * NFS4_MAX_ACESIZE -- the number of bytes in the string representation we
+ * read in (not the same as on-the-wire, which is also not the same as how
+ * NFSD actually stores the ACEs).
  *
- * which equals 160
+ * Note that right now NFSD tolerates at most 170 ACEs, regardless of size,
+ * and linux in general tolerates at most 64KB xattrs.
  *
- * plus 1 for fgets, but let's make it 2...
+ * :     3 of these
+ * type  1
+ * flag  7 (total number of flag characters)
+ * who   NFS4_MAX_PRINCIPALSIZE  (user:128, domain:256, '@':1, NULL:1)
+ * mask  14 (total number of dir + common mask characters)
  *
- * 162 is the current grand total.
+ * which equals 410.  let's try that for now.
  */
-#define NFS4_MAX_ACESIZE 	4 + 2 + 2 + 10 + 128 + 14 + 2
+#define NFS4_MAX_ACESIZE	(3 + 1 + 7 + NFS4_MAX_PRINCIPALSIZE + 14)
 
-	
+/*
+ * NFS4_MAX_ACLSIZE -- the number of bytes in the string representation
+ * of a whole ACL, regardless of the number of ACEs; used to set buffer
+ * sizes.  since linux limits xattrs to 64KB anyway, we don't have to
+ * worry about/can't really handle huge ACLs.  while the string
+ * representation doesn't directly compare to the xattr size, this
+ * is probably a reasonable guess.
+ */
+#define NFS4_MAX_ACLSIZE	(65536)
+
+
 /* NFS4 acl xattr name */
 #define ACL_NFS4_XATTR "system.nfs4_acl"
 
