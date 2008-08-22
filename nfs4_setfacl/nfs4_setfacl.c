@@ -346,6 +346,7 @@ static int apply_action(const char *_path, const struct stat *stat, int flag, st
 	err = do_apply_action(path, stat);
 	if (do_recursive && flag == FTW_DNR)
 		err = 1; 
+	free(path);
 
 	return err;
 }
