@@ -94,38 +94,34 @@ free_fields(char *fields[NUMFIELDS])
 int
 parse_alloc_fields(char *buf, char *fields[NUMFIELDS])
 {
-	char *prev, *next;
-	int len, i,j;
+	char *field;
+	int i, len, count = 0;
 
 	if (!buf)
 		return -EINVAL;
 
 	memset(fields, 0, sizeof(fields));
-	prev = buf;
-	for (i = 0; i < 3; i++) {
-		next = strchr(prev, ':');
-		if (next == NULL)
-			return -EINVAL;
-		len = next - prev;
-		for (j = 0; j < len; j++) {
-			if (prev[0] == ' ') {
-				prev++;
-				len--;
-			}
-		}
+
+	for (i = 0; buf[i] != '\0'; i++) {
+		if (buf[i] == ':')
+			count++;
+	}
+	if (count != 3)
+		goto out_free;
+
+	for (i = 0; i < NUMFIELDS; i++) {
+		field = strsep(&buf, ":");
+		len = strlen(field);
 		fields[i] = malloc(len + 1);
 		if (!fields[i])
 			goto out_free;
 		if (len > 0)
-			memcpy(fields[i], prev, len);
+			memcpy(fields[i], field, len);
 		fields[i][len] = 0;
-		prev = ++next;
 	}
-	len = strlen(prev);
-	fields[NUMFIELDS - 1] = malloc(len + 1);
-	if (len > 0)
-		memcpy(fields[NUMFIELDS - 1], prev, len);
-	fields[NUMFIELDS - 1][len] = 0;
+
+	if (!fields[TYPE_INDEX][0] || !fields[WHO_INDEX][0] || !fields[MASK_INDEX][0])
+		goto out_free;
 
 	return 0;
 out_free:
