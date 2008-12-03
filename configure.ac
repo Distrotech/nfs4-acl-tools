@@ -1,4 +1,4 @@
-AC_INIT([nfs4acl], [0.3])
+AC_INIT([nfs4-acl-tools], [0.3.3])
 AC_CONFIG_HEADER(include/config.h)
 AC_PREFIX_DEFAULT(/usr/local)
 
