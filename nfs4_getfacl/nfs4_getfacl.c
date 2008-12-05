@@ -71,6 +71,7 @@ int main(int argc, char **argv)
 	acl = nfs4_acl_for_path(argv[1]);
 	if (acl != NULL) {
 		nfs4_print_acl(stdout, acl);
+		nfs4_free_acl(acl);
 		res = 0;
 	}
 out:
