@@ -469,7 +469,7 @@ static struct nfs4_acl* edit_ACL(struct nfs4_acl *acl, const char *path, const s
 
 	if ((newacl = nfs4_new_acl(S_ISDIR(stat->st_mode))) == NULL) {
 		fprintf(stderr, "Failed creating new ACL from tempfile %s. Aborting.\n", tmp_name);
-		goto out;
+		goto out_close;
 	}
 	if (open_editor(tmp_name))
 		goto failed;
@@ -477,13 +477,16 @@ static struct nfs4_acl* edit_ACL(struct nfs4_acl *acl, const char *path, const s
 		fprintf(stderr, "Failed loading ACL from edit tempfile %s. Aborting.\n", tmp_name);
 		goto failed;
 	}
+
+out_close:
+	fclose(tmp_fp);
 out:
 	unlink(tmp_name);
 	return newacl;
 failed:
 	nfs4_free_acl(newacl);
 	newacl = NULL;
-	goto out;
+	goto out_close;
 }
 
 /* returns 0 on success, nonzero on failure */
