@@ -39,7 +39,7 @@
 #include <stdio.h>
 #include "libacl_nfs4.h"
 
-static int nfs4_getxattr(const char *, void *, size_t);
+static int nfs4_getxattr(const char *, void **);
 
 /* returns a newly-allocated struct nfs4_acl for `path', or NULL on error. */
 struct nfs4_acl* nfs4_acl_for_path(const char *path)
@@ -63,45 +63,60 @@ struct nfs4_acl* nfs4_acl_for_path(const char *path)
 	else
 		iflags = NFS4_ACL_ISFILE;
 
-	/* find necessary buffer size */
-	result = nfs4_getxattr(path, NULL, 0);
-	if (result < 0)
-		goto out;
-	xattr = malloc(result);
-	if (!xattr) {
-		printf("Failed to allocate memory\n");
-		goto out;
-	}
-
 	/* reconstruct the ACL */
-	result = nfs4_getxattr(path, xattr, result);
+	result = nfs4_getxattr(path, &xattr);
 	if (result < 0)
-		goto out_free;
+		goto out;
 	acl = acl_nfs4_xattr_load(xattr, result, iflags);
 	if (acl == NULL)
 		perror("Failed to extract nfs4acl from xattr");
-out_free:
 	free(xattr);
 out:
 	return acl;
 }
 
-static int nfs4_getxattr(const char *path, void *value, size_t size)
-{
-	int res;
+#define NFS4_DEFAULT_ACLSIZE (4096)
 
-	res = getxattr(path, ACL_NFS4_XATTR, value, size);
+static int nfs4_getxattr(const char *path, void **value)
+{
+	int res = -1;
+	ssize_t size = NFS4_DEFAULT_ACLSIZE;
+	void *tmp;
+
+	*value = malloc(size);
+	if (*value == NULL) {
+		fprintf(stderr, "Unable to alloc xattr buffer (size %d).\n", size);
+		goto out;
+	}
+again:
+	res = getxattr(path, ACL_NFS4_XATTR, *value, size);
 	if (res < -10000) {
-		fprintf(stderr,"An internal NFS server error code (%d) was returned; this should never happen.\n",res);
+		fprintf(stderr, "An internal NFS server error code (%d) was returned; this should never happen.\n", res);
 	} else if (res < 0) {
 		if (errno == ENOATTR)
-			fprintf(stderr,"Attribute not found on file.\n");
+			fprintf(stderr, "Attribute not found on file.\n");
 		else if (errno == EREMOTEIO)
-		    fprintf(stderr,"An NFS server error occurred.\n");
+			fprintf(stderr, "An NFS server error occurred.\n");
 		else if (errno == EOPNOTSUPP)
-			fprintf(stderr,"Operation to request attribute not supported.\n");
-		else
+			fprintf(stderr, "Operation to request attribute not supported.\n");
+		else if (errno == ERANGE) {
+			if ((size <<= 1) > NFS4_MAX_ACLSIZE) {
+				fprintf(stderr, "Unable to alloc xattr buffer over maxsize %d.\n", NFS4_MAX_ACLSIZE);
+				goto out_free;
+			}
+			tmp = realloc(*value, size);
+			if (tmp == NULL) {
+				fprintf(stderr, "Unable to alloc xattr buffer (size %d).\n", size);
+				goto out_free;
+			}
+			*value = tmp;
+			goto again;
+		} else
 			perror("Failed getxattr operation");
 	}
+out:
 	return res;
+out_free:
+	free(*value);
+	goto out;
 }
