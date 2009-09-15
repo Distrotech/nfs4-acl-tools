@@ -120,7 +120,7 @@ parse_alloc_fields(char *buf, char *fields[NUMFIELDS])
 		fields[i][len] = 0;
 	}
 
-	if (!fields[TYPE_INDEX][0] || !fields[WHO_INDEX][0] || !fields[MASK_INDEX][0])
+	if (!fields[TYPE_INDEX][0] || !fields[WHO_INDEX][0])
 		goto out_free;
 
 	return 0;
