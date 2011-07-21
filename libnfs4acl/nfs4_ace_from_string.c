@@ -150,7 +150,7 @@ struct nfs4_ace * nfs4_ace_from_string(char *ace_buf, int is_dir)
 	/* parse_alloc_fields had split up ace_buf so now we copy it to bufp */
 	bufp = malloc(strlen(ace_buf) + 1);
 	if (!bufp)
-		goto out_free;
+		goto out;
 	strcpy(bufp,ace_buf);
 
 	ret = parse_alloc_fields(bufp, fields);
