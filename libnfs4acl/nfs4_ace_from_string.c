@@ -100,7 +100,7 @@ parse_alloc_fields(char *buf, char *fields[NUMFIELDS])
 	if (!buf)
 		return -EINVAL;
 
-	memset(fields, 0, sizeof(fields));
+	memset(fields, 0, sizeof(char *) * NUMFIELDS);
 
 	for (i = 0; buf[i] != '\0'; i++) {
 		if (buf[i] == ':')
