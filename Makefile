@@ -59,7 +59,7 @@ else
 clean:	# if configure hasn't run, nothing to clean
 endif
 
-$(CONFIGURE):
+$(CONFIGURE): aclocal.m4
 	autoconf
 	./configure \
 		--prefix=/ \

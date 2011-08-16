@@ -1,7 +1,6 @@
 Installation:
 	1) to build and install the commandline tools (nfs4_getfacl, 
 	   nfs4_setfacl):
-		   $ ./configure
 		   $ make
 		   $ make install
 
