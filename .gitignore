@@ -2,8 +2,12 @@
 *.lo
 *.la
 *.a
+aclocal.m4
+autom4te.cache/
 config.log
 config.status
+configure
+GUI/nfs4-acl-editor/Makefile
 include/builddefs
 include/config.h
 libnfs4acl/.libs/
