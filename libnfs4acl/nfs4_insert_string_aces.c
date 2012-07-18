@@ -45,7 +45,7 @@ int nfs4_insert_string_aces(struct nfs4_acl *acl, const char *acl_spec, unsigned
 	if ((s = sp = strdup(acl_spec)) == NULL)
 		goto out_failed;
 
-	while ((ssp = strsep(&sp, " ,\t\n\r")) != NULL) {
+	while ((ssp = strsep(&sp, ",\t\n\r")) != NULL) {
 		if (!strlen(ssp))
 			continue;
 

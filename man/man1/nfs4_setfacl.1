@@ -204,7 +204,7 @@ delete the first ACE, but only print the resulting ACL (does not save changes):
 .IP - 2
 delete the last two ACEs above:
 .br
-	$ nfs4_setfacl -x "A::EVERYONE@rtncy, D::EVERYONE@:waxTC" foo
+	$ nfs4_setfacl -x A::EVERYONE@rtncy,D::EVERYONE@:waxTC foo
 .IP - 2
 modify (in-place) the second ACE above:
 .br
