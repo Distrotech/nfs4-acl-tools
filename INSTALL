@@ -18,7 +18,7 @@ Installation:
 	
 
 	3) in case of trouble, please see "Random Notes" below or contact
-	   linux-nfs.kernel.org.
+	   linux-nfs@vger.kernel.org.
 
 
 Random Notes (about some distros..):
@@ -45,4 +45,4 @@ Random Notes (about some distros..):
 	rerunning `configure' and `make' should probably fix the problem.
 	 
 
-please send any email to <linux-nfs.kernel.org>.
+please send any email to <linux-nfs@vger.kernel.org>.
