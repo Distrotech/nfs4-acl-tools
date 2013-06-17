@@ -1,0 +1,6 @@
+#!/bin/bash
+
+unset DIST_ROOT
+
+make ${MAKE_J}
+make DESTDIR=${3} install
