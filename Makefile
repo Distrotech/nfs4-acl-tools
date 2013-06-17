@@ -94,5 +94,5 @@ install-lib: default
 	$(SUBDIRS_MAKERULE)
 
 realclean distclean: clean
-	rm -f $(LDIRT) $(CONFIGURE)
+	rm -f $(LDIRT) #$(CONFIGURE)
 	rm -rf autom4te.cache Logs
