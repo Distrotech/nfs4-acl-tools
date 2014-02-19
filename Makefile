@@ -75,7 +75,7 @@ $(CONFIGURE): aclocal.m4
 	touch .census
 
 aclocal.m4::
-	aclocal --acdir=$(TOPDIR)/m4 --output=$@
+	aclocal --output=$@
 
 # we don't have any docs to install just now ...
 #
