@@ -457,7 +457,8 @@ static struct nfs4_acl* edit_ACL(struct nfs4_acl *acl, const char *path, const s
 	}
 	if ((tmp_fp = fdopen(tmp_fd, "w+")) == NULL) {
 		fprintf(stderr, "Unable to fdopen tempfile \"%s\" for editing.\n", tmp_name);
-		goto out;
+		close(tmp_fd);
+		goto out_unlink;
 	}
 
 	if (stat->st_mode & S_IFDIR)
@@ -478,6 +479,8 @@ static struct nfs4_acl* edit_ACL(struct nfs4_acl *acl, const char *path, const s
 		goto failed;
 	}
 out:
+	fclose(tmp_fp);
+out_unlink:
 	unlink(tmp_name);
 	return newacl;
 failed:
