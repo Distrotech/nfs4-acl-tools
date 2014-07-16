@@ -569,7 +569,7 @@ void NFS4_ACL_Editor::syncWho(struct nfs4_ace *ace, const char *who)
 		if (i > strlen(ace->who)) {
 			dprintf("syncWho(): fromlen %d  tolen %u\n", strlen(ace->who), i);
 		}
-		strlcpy(ace->who, who, NFS4_MAX_PRINCIPALSIZE);
+		strncpy(ace->who, who, NFS4_MAX_PRINCIPALSIZE);
 	}
 }
 
