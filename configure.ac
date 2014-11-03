@@ -2,6 +2,8 @@ AC_INIT([nfs4-acl-tools], [0.3.3])
 AC_CONFIG_HEADER(include/config.h)
 AC_PREFIX_DEFAULT(/usr/local)
 
+AC_CONFIG_MACRO_DIRS([m4])
+
 AC_ARG_ENABLE(shared,
 			  [  --enable-shared=[yes/no]  Enable use of shared libraries [default=no]],,
 			     enable_shared=no)
