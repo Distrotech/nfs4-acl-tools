@@ -51,9 +51,6 @@ struct nfs4_ace * nfs4_new_ace(int is_directory, u32 type, u32 flag, u32 access_
 	ace->type = type;
 	ace->flag = flag;
 
-	if( type == NFS4_ACE_ACCESS_DENIED_ACE_TYPE )
-		access_mask = access_mask & ~(NFS4_ACE_MASK_IGNORE);
-
 	/* Castrate delete_child if we aren't a directory */
 	if (!is_directory)
 		access_mask &= ~NFS4_ACE_DELETE_CHILD;

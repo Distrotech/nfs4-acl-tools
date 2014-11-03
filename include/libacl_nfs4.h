@@ -95,16 +95,6 @@
 #define NFS4_INHERITANCE_FLAGS (NFS4_ACE_FILE_INHERIT_ACE \
 		| NFS4_ACE_DIRECTORY_INHERIT_ACE | NFS4_ACE_INHERIT_ONLY_ACE)
 
-#define NFS4_ACE_MASK_IGNORE (NFS4_ACE_DELETE | NFS4_ACE_WRITE_OWNER \
-		| NFS4_ACE_READ_NAMED_ATTRS | NFS4_ACE_WRITE_NAMED_ATTRS)
-/* XXX not sure about the following.  Note that e.g. DELETE_CHILD is wrong in
- * general (should only be ignored on files). */
-#define MASK_EQUAL(mask1, mask2) \
-	(((mask1) & NFS4_ACE_MASK_ALL & ~NFS4_ACE_MASK_IGNORE & \
-	  					~NFS4_ACE_DELETE_CHILD) \
-	 == ((mask2) & NFS4_ACE_MASK_ALL & ~NFS4_ACE_MASK_IGNORE & \
-		 				~NFS4_ACE_DELETE_CHILD))
-
 /*
  * NFS4_MAX_ACESIZE -- the number of bytes in the string representation we
  * read in (not the same as on-the-wire, which is also not the same as how
